@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
+import { sendMail } from "../nodemailer/mailsend.js";
 
 export const signup = async (req, res) => {
   try {
@@ -74,6 +75,12 @@ export const login = async (req, res) => {
       email: user.email ? user.email : "",
       profilePic: user.profilePic,
     });
+
+    sendMail(
+      user.email,
+      "Welcome to the Community!",
+      "Welcome to the community! Glad to have you with us! Please login with our system to continue"
+    );
   } catch (error) {
     console.log("Error occured in login controller");
     return res.status(500).json({ error: error, message: "An error occured" });
