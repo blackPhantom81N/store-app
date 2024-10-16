@@ -1,19 +1,31 @@
 import {
   Box,
+  Button,
   Heading,
   HStack,
   IconButton,
   Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
   useColorModeValue,
+  useDisclosure,
   useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useProductStore } from "../store/product";
+import TextInput from "./TextInput";
+import { useState } from "react";
 
 interface Product {
-  _id: string;
+  _id?: string;
   name: string;
   price: string;
   image: string;
@@ -24,13 +36,15 @@ interface ProductCardProps {
   product?: Product;
 }
 
-const ProductCard = ({ id, product }: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
+  const [updatedProduct, setUpdatedProduct] = useState(product);
   const textColor = useColorModeValue("gray.600", "gray.200");
   const bgColor = useColorModeValue("white", "gray.800");
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   console.log("Products in card ", product);
 
-  const { deleteProducts } = useProductStore();
+  const { deleteProducts, updatedProducts } = useProductStore();
   const toast = useToast();
 
   const handleDeleteProduct = async (pid: string) => {
@@ -49,6 +63,29 @@ const ProductCard = ({ id, product }: ProductCardProps) => {
       toast({
         title: "Error",
         status: "error",
+      });
+    }
+  };
+
+  const handleUpdateProduct = async (pid: string, updatedProduct: Product) => {
+    //TODO:Fix the type issues
+    const { success, message } = await updatedProducts(pid, updatedProduct);
+    onClose();
+    if (!success) {
+      toast({
+        title: "Error",
+        description: message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Product updated successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
     }
   };
@@ -83,6 +120,7 @@ const ProductCard = ({ id, product }: ProductCardProps) => {
             aria-label="edit-btn"
             icon={<FaRegEdit />}
             colorScheme="blue"
+            onClick={onOpen}
           />
           <IconButton
             aria-label="delete-btn"
@@ -96,6 +134,73 @@ const ProductCard = ({ id, product }: ProductCardProps) => {
           />
         </HStack>
       </Box>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Update Product</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4}>
+              <TextInput
+                placeholder="Product Name"
+                name="name"
+                value={updatedProduct?.name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  if (updatedProduct) {
+                    setUpdatedProduct({
+                      ...updatedProduct,
+                      name: e.target.value,
+                    });
+                  }
+                }}
+              />
+              <TextInput
+                placeholder="Price"
+                name="price"
+                value={updatedProduct?.price}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  if (updatedProduct) {
+                    setUpdatedProduct({
+                      ...updatedProduct,
+                      price: e.target.value,
+                    });
+                  }
+                }}
+              />
+              <TextInput
+                placeholder="Image URL"
+                name="image"
+                value={updatedProduct?.image}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  if (updatedProduct) {
+                    setUpdatedProduct({
+                      ...updatedProduct,
+                      image: e.target.value,
+                    });
+                  }
+                }}
+              />
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={() => {
+                if (product?._id && updatedProduct) {
+                  handleUpdateProduct(product._id, updatedProduct);
+                }
+              }}
+            >
+              Update Product
+            </Button>
+            <Button colorScheme="gray" onClick={onClose}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

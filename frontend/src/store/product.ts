@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 interface Product {
-  _id: string;
+  _id?: string;
   name: string;
   price: string;
   image: string;
@@ -16,6 +16,10 @@ interface ProductStore {
   fetchProducts: () => Promise<void>;
   deleteProducts: (
     id: string
+  ) => Promise<{ success: boolean; message: string } | undefined>;
+  updatedProducts: (
+    pid: string,
+    updatedProduct: Product
   ) => Promise<{ success: boolean; message: string } | undefined>;
 }
 
@@ -56,5 +60,24 @@ export const useProductStore = create<ProductStore>((set) => ({
     }));
 
     return { success: true, message: data.message };
+  },
+  updatedProducts: async (pid, updatedProduct) => {
+    const res = await fetch(`/api/products/${pid}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedProduct),
+    });
+    const data = await res.json();
+    if (!data.success) {
+      return { success: false, message: data.message };
+    }
+    //update UI without refresh
+    set((state) => ({
+      products: state.products.map((product) =>
+        product._id === pid ? data.data : product
+      ),
+    }));
   },
 }));

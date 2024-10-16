@@ -12,6 +12,7 @@ import { useProductStore } from "../store/product";
 import { useToast } from "@chakra-ui/react";
 
 interface Product {
+  _id?: string;
   name: string;
   price: string;
   image: string;
