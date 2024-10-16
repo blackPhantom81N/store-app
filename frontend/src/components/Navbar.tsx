@@ -1,12 +1,21 @@
-import { Button, Container, Flex, HStack, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Container,
+  Flex,
+  HStack,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { FaRegSquarePlus } from "react-icons/fa6";
+import { IoMoon } from "react-icons/io5";
+import { IoSunny } from "react-icons/io5";
 
 const Navbar = () => {
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Container maxW={"1140px"} paddingX={"4px"}>
       <Flex
-        h={"16px"}
         alignItems={"center"}
         justifyContent={"space-between"}
         flexDir={{
@@ -31,6 +40,9 @@ const Navbar = () => {
               <FaRegSquarePlus fontSize={"20"} />
             </Button>
           </Link>
+          <Button onClick={toggleColorMode}>
+            {colorMode === "light" ? <IoMoon /> : <IoSunny />}
+          </Button>
         </HStack>
       </Flex>
     </Container>
