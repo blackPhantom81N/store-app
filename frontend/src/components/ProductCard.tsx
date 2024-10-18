@@ -68,25 +68,30 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   const handleUpdateProduct = async (pid: string, updatedProduct: Product) => {
-    //TODO:Fix the type issues
-    const { success, message } = await updatedProducts(pid, updatedProduct);
-    onClose();
-    if (!success) {
-      toast({
-        title: "Error",
-        description: message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Product updated successfully",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
+    const result = await updatedProducts(pid, updatedProduct);
+
+    if (result) {
+      const { success, message } = result;
+
+      onClose();
+
+      if (!success) {
+        toast({
+          title: "Error",
+          description: message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Product updated successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     }
   };
 
