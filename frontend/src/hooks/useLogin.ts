@@ -12,8 +12,6 @@ const useLogin = () => {
   const { setAuthUser } = useAuthContext();
   const toast = useToast();
   const login = async ({ username, password }: LoginTypes) => {
-    console.log(username);
-    console.log(password);
     const success = handleInputErrors(username, password, toast);
     if (!success) {
       return;
